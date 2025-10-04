@@ -1,4 +1,4 @@
-package net.javaguides.springboot;
+package net.javaguides.springboot.springboot;
 
 import com.launchdarkly.eventsource.MessageEvent;
 import com.launchdarkly.eventsource.background.BackgroundEventHandler;

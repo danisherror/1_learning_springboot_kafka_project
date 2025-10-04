@@ -1,4 +1,4 @@
-package net.javaguides.springboot;
+package net.javaguides.springboot.springboot;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
