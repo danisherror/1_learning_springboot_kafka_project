@@ -11,7 +11,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.time.Duration;
 
 @Service
 public class WikimediaChangesProducer {
@@ -30,30 +29,30 @@ public class WikimediaChangesProducer {
 
         BackgroundEventHandler eventHandler = new WikimediaChangesHandler(kafkaTemplate, topic);
 
-        // ✅ Create headers
+        // Required headers to avoid 403 errors
         Headers headers = new Headers.Builder()
                 .add("User-Agent", "SpringBootKafkaClient/1.0 (danish.mahajan@example.com)")
                 .build();
 
-        // ✅ Create ConnectStrategy (immutable)
+        // ConnectStrategy (reconnect is handled internally)
         ConnectStrategy connectStrategy = ConnectStrategy.http(URI.create(url))
                 .headers(headers);
 
-        // ✅ EventSource builder
-        EventSource.Builder eventSourceBuilder = new EventSource.Builder(connectStrategy)
-                .reconnectTime(Duration.ofSeconds(3)); // reconnectTime set here, not on ConnectStrategy
+        EventSource.Builder eventSourceBuilder = new EventSource.Builder(connectStrategy);
 
-        // ✅ Wrap in BackgroundEventSource
+        // Wrap in BackgroundEventSource
         BackgroundEventSource.Builder builder = new BackgroundEventSource.Builder(eventHandler, eventSourceBuilder);
         BackgroundEventSource eventSource = builder.build();
 
         // Start streaming
         eventSource.start();
+        logger.info("Wikimedia changes stream started...");
 
-        // Keep alive for 10 minutes
+        // Keep streaming for 10 minutes
         Thread.sleep(10 * 60 * 1000);
 
-        // Close gracefully
+        // Stop streaming
         eventSource.close();
+        logger.info("Wikimedia changes stream stopped.");
     }
 }
